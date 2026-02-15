@@ -9,16 +9,22 @@ OmniView es una solución integral de monitorización y control para entornos em
 - **Diseño Premium:** Interfaz oscura con efectos de glassmorphism y transiciones suaves para una experiencia de usuario superior.
 - **Navegación Intuitiva:** Barra lateral persistente para acceso rápido a todas las secciones.
 
+![Dashboard Preview](public/screenshots/dashboard.png)
+
 ### 🖥️ Gestión de Escritorios Remotos (`/desktops`)
 - **Grid de Visualización:** Miniaturas en tiempo real (simuladas) de todos los escritorios conectados.
 - **Control VNC:** Acceso remoto completo con solo un clic, incluyendo modo de pantalla completa inmersiva.
 - **Organización por Departamentos:** Filtros y búsqueda avanzada para gestión eficiente de grandes flotas de equipos.
 - **Indicadores de Estado:** Visualización clara de equipos Online, Offline u Ocupados.
 
+![Desktops Preview](public/screenshots/desktops.png)
+
 ### 📷 Sistema de Videovigilancia (`/cameras`)
 - **Matriz de Video:** Visualización simultánea de múltiples feeds de seguridad.
 - **Alertas en Tiempo Real:** Indicadores de estado de grabación y detección de movimiento.
 - **Interfaz Limpia:** Maximiza el área de visualización sin distracciones.
+
+![Cameras Preview](public/screenshots/cameras.png)
 
 ## 🛠️ Tecnologías Utilizadas
 
