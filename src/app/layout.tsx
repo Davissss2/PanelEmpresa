@@ -27,6 +27,21 @@ export default function RootLayout({
             </main>
           </div>
         </TooltipProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const observer = new MutationObserver(() => {
+                  const portal = document.querySelector('nextjs-portal');
+                  if (portal) portal.remove();
+                  const toast = document.querySelector('[data-nextjs-toast]');
+                  if (toast) toast.remove();
+                });
+                observer.observe(document.body, { childList: true, subtree: true });
+              })();
+            `,
+          }}
+        />
       </body>
     </html>
   );

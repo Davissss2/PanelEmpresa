@@ -1,133 +1,267 @@
 "use client";
 
-import { CAMERAS, COMPUTERS } from "@/lib/mock-data";
-import { Activity, ShieldCheck, AlertTriangle, Monitor, Video, ArrowUpRight } from "lucide-react";
+import { Activity, ShieldCheck, AlertTriangle, Monitor, Video, Server, Users, Bell, Cpu, HardDrive } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
-export default function Home() {
-  // Stats calculation
-  const totalPCs = COMPUTERS.length;
-  const onlinePCs = COMPUTERS.filter(c => c.status === 'online').length;
-  const busyPCs = COMPUTERS.filter(c => c.status === 'busy').length;
-  const offsetPCs = totalPCs - (onlinePCs + busyPCs);
+// --- Components ---
 
-  const activeCameras = CAMERAS.filter(c => c.status === 'active').length;
-  const totalCameras = CAMERAS.length;
+const NeonCard = ({
+  title,
+  value,
+  icon: Icon,
+  color,
+  children
+}: {
+  title: string;
+  value: string;
+  icon: any;
+  color: "green" | "blue" | "red";
+  children?: React.ReactNode
+}) => {
+  const colorStyles = {
+    green: "border-green-500/50 shadow-[0_0_20px_rgba(34,197,94,0.15)] text-green-400",
+    blue: "border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.15)] text-cyan-400",
+    red: "border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.15)] text-red-400",
+  };
 
-  const stats = [
-    {
-      label: "Equipos Online",
-      value: onlinePCs,
-      total: totalPCs,
-      icon: Monitor,
-      color: "text-green-500",
-      bg: "bg-green-500/10",
-      border: "border-green-500/20"
-    },
-    {
-      label: "Cámaras Activas",
-      value: activeCameras,
-      total: totalCameras,
-      icon: Video,
-      color: "text-blue-500",
-      bg: "bg-blue-500/10",
-      border: "border-blue-500/20"
-    },
-    {
-      label: "Incidencias",
-      value: CAMERAS.filter(c => c.status === 'error').length + COMPUTERS.filter(c => c.status === 'offline').length,
-      total: null,
-      icon: AlertTriangle,
-      color: "text-red-500",
-      bg: "bg-red-500/10",
-      border: "border-red-500/20"
-    }
-  ];
+  const gradientStyles = {
+    green: "from-green-500/10 to-transparent",
+    blue: "from-cyan-500/10 to-transparent",
+    red: "from-red-500/10 to-transparent",
+  };
 
   return (
-    <div className="flex-1 p-8 overflow-auto bg-[#0f172a] text-slate-100 h-full">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Panel General</h1>
-        <p className="text-slate-400">Visión global del sistema y métricas clave</p>
+    <div className={cn(
+      "relative p-6 rounded-2xl border bg-slate-900/80 backdrop-blur-md overflow-hidden transition-all duration-300 hover:scale-[1.02]",
+      colorStyles[color]
+    )}>
+      {/* Background Gradient */}
+      <div className={cn("absolute inset-0 bg-gradient-to-br opacity-50 pointer-events-none", gradientStyles[color])} />
+
+      {/* Content */}
+      <div className="relative z-10">
+        <div className="flex justify-between items-start mb-4">
+          <div className={cn("p-2 rounded-lg bg-slate-950/50 border border-current", colorStyles[color].split(" ")[0])}>
+            <Icon className="w-6 h-6" />
+          </div>
+          <div className="flex space-x-1">
+            <div className={cn("w-2 h-2 rounded-full animate-pulse", color === 'green' ? 'bg-green-500' : color === 'blue' ? 'bg-cyan-500' : 'bg-red-500')} />
+          </div>
+        </div>
+
+        <h3 className="text-slate-400 text-sm font-medium tracking-wider uppercase mb-1">{title}</h3>
+        <div className="text-3xl font-bold text-white tracking-tight text-shadow-sm">{value}</div>
+
+        {children && <div className="mt-4">{children}</div>}
+      </div>
+    </div>
+  );
+};
+
+const Waveform = () => {
+  const [bars, setBars] = useState<number[]>([]);
+
+  useEffect(() => {
+    setBars(Array.from({ length: 20 }, () => Math.random() * 80 + 20));
+  }, []);
+
+  return (
+    <div className="w-full h-full min-h-[100px] flex items-end justify-between gap-1 overflow-hidden opacity-80">
+      {bars.map((height, i) => (
+        <div
+          key={i}
+          className="w-full bg-cyan-500/40 rounded-t-sm animate-pulse"
+          style={{
+            height: `${height}%`,
+            animationDelay: `${i * 0.1}s`,
+            animationDuration: '1.5s'
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+const AreaChart = ({ color }: { color: string }) => {
+  const [heights, setHeights] = useState<number[]>([]);
+
+  useEffect(() => {
+    setHeights(Array.from({ length: 12 }, () => 30 + Math.random() * 60));
+  }, []);
+
+  return (
+    <div className="h-16 w-full flex items-end gap-1 opacity-60">
+      {heights.map((height, i) => (
+        <div
+          key={i}
+          className={cn("flex-1 rounded-t-sm hover:opacity-100 transition-opacity", color)}
+          style={{ height: `${height}%` }}
+        />
+      ))}
+    </div>
+  );
+};
+
+export default function Dashboard() {
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(new Date().toLocaleTimeString('es-ES'));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex-1 p-6 md:p-8 overflow-auto bg-[#050505] text-slate-100 h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-900/40 via-[#050505] to-[#050505]">
+
+      {/* Header / Top Bar */}
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tighter flex items-center gap-2">
+            <span className="text-cyan-500">OMNI</span>VIEW
+            <div className="h-2 w-2 rounded-full bg-cyan-500 animate-pulse ml-2" />
+          </h1>
+          <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">System Monitor v2.4</p>
+        </div>
+        <div className="text-right">
+          <div className="text-2xl font-mono font-bold text-cyan-400">{time || "--:--:--"}</div>
+          <div className="text-xs text-slate-500 font-mono">LIVE FEED</div>
+        </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        {stats.map((stat, i) => (
-          <div key={i} className={cn("p-6 rounded-2xl border bg-slate-900/50 backdrop-blur flex items-center justify-between", stat.border)}>
-            <div>
-              <p className="text-sm font-medium text-slate-400 mb-1">{stat.label}</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-bold text-white">{stat.value}</span>
-                {stat.total !== null && <span className="text-sm text-slate-500">/ {stat.total}</span>}
-              </div>
-            </div>
-            <div className={cn("w-14 h-14 rounded-full flex items-center justify-center", stat.bg)}>
-              <stat.icon className={cn("w-7 h-7", stat.color)} />
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100%-80px)]">
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Activity / Status */}
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-lg text-white flex items-center gap-2">
-              <Activity className="w-5 h-5 text-blue-500" />
-              Estado del Sistema
-            </h3>
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-xs font-semibold text-green-500">OPERATIVO</span>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-xl bg-slate-950/50 border border-slate-800/50">
-              <div className="flex items-center gap-3">
-                <Monitor className="w-5 h-5 text-slate-500" />
-                <div>
-                  <p className="text-sm font-medium text-white">Red de Equipos</p>
-                  <p className="text-xs text-slate-500">LAN Principal - 1000 Mbps</p>
+        {/* Left Column (Stats) */}
+        <div className="lg:col-span-2 space-y-6 flex flex-col">
+          {/* Top Stats Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <NeonCard title="Red de Equipos" value="45/48" icon={Monitor} color="green">
+              <AreaChart color="bg-green-500" />
+            </NeonCard>
+            <NeonCard title="Cámaras Activas" value="24/24" icon={Video} color="blue">
+              <AreaChart color="bg-cyan-500" />
+            </NeonCard>
+            <NeonCard title="Incidencias" value="3" icon={AlertTriangle} color="red">
+              <div className="h-16 flex items-center">
+                <div className="w-full bg-red-900/30 rounded-full h-2 overflow-hidden">
+                  <div className="bg-red-500 h-full w-[15%] rounded-full animate-pulse" />
                 </div>
               </div>
-              <span className="text-xs font-bold text-green-400">ESTABLE</span>
-            </div>
-            <div className="flex items-center justify-between p-4 rounded-xl bg-slate-950/50 border border-slate-800/50">
-              <div className="flex items-center gap-3">
-                <Video className="w-5 h-5 text-slate-500" />
-                <div>
-                  <p className="text-sm font-medium text-white">Servidor de Video</p>
-                  <p className="text-xs text-slate-500">Grabación Continua (30 días)</p>
-                </div>
+            </NeonCard>
+          </div>
+
+          {/* Main Visualization (Waveform/Map) */}
+          <div className="flex-1 min-h-[300px] relative rounded-3xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm overflow-hidden p-6 flex flex-col shadow-2xl">
+            <div className="flex justify-between items-center mb-4 z-10">
+              <h2 className="text-lg font-bold text-slate-300 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-cyan-500" />
+                Tráfico de Red en Tiempo Real
+              </h2>
+              <div className="flex gap-2">
+                <span className="w-3 h-1 bg-cyan-500 rounded-full" />
+                <span className="w-3 h-1 bg-slate-700 rounded-full" />
+                <span className="w-3 h-1 bg-slate-700 rounded-full" />
               </div>
-              <span className="text-xs font-bold text-green-400">GRABANDO</span>
+            </div>
+
+            {/* Graph Container */}
+            <div className="absolute inset-0 pt-20 px-6 pb-0 flex items-end opacity-60">
+              <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0 100 L0 80 Q 10 40 20 70 T 40 60 T 60 85 T 80 50 T 100 70 L 100 100 Z" fill="url(#grad1)" stroke="cyan" strokeWidth="0.5" className="animate-pulse" />
+                <defs>
+                  <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style={{ stopColor: 'cyan', stopOpacity: 0.2 }} />
+                    <stop offset="100%" style={{ stopColor: 'cyan', stopOpacity: 0 }} />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            {/* Overlay Data or Grid Lines */}
+            <div className="relative z-10 mt-auto grid grid-cols-4 gap-4 text-center">
+              <div className="p-3 rounded-lg bg-black/40 border border-white/5 backdrop-blur-md">
+                <div className="text-xs text-slate-500 mb-1">Upload</div>
+                <div className="text-lg font-mono text-cyan-400">450 Mb/s</div>
+              </div>
+              <div className="p-3 rounded-lg bg-black/40 border border-white/5 backdrop-blur-md">
+                <div className="text-xs text-slate-500 mb-1">Download</div>
+                <div className="text-lg font-mono text-blue-400">890 Mb/s</div>
+              </div>
+              <div className="p-3 rounded-lg bg-black/40 border border-white/5 backdrop-blur-md">
+                <div className="text-xs text-slate-500 mb-1">Ping</div>
+                <div className="text-lg font-mono text-green-400">12 ms</div>
+              </div>
+              <div className="p-3 rounded-lg bg-black/40 border border-white/5 backdrop-blur-md">
+                <div className="text-xs text-slate-500 mb-1">Jitter</div>
+                <div className="text-lg font-mono text-slate-300">2 ms</div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Quick Actions / Shortcuts */}
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800">
-          <h3 className="font-bold text-lg text-white mb-6">Accesos Directos</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <Link href="/cameras" className="group p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 transition-all">
-              <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3 group-hover:bg-blue-500/20 transition-colors">
-                <Video className="w-5 h-5 text-blue-500" />
+        {/* Right Column (Side List) */}
+        <div className="bg-slate-900/30 border border-slate-800 rounded-2xl p-6 backdrop-blur-md flex flex-col gap-6">
+          <div>
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex justify-between items-center">
+              Sistema
+              <Cpu className="w-4 h-4" />
+            </h2>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-slate-400">
+                  <span>CPU Load</span>
+                  <span>34%</span>
+                </div>
+                <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-full w-[34%] bg-cyan-500 rounded-full shadow-[0_0_10px_rgba(6,182,212,0.5)]" />
+                </div>
               </div>
-              <p className="font-bold text-white group-hover:text-blue-400 transition-colors">Ver Cámaras</p>
-              <p className="text-xs text-slate-500 mt-1">Acceso a 4 streams</p>
-            </Link>
-            <Link href="/desktops" className="group p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-purple-500/50 hover:bg-slate-900 transition-all">
-              <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mb-3 group-hover:bg-purple-500/20 transition-colors">
-                <Monitor className="w-5 h-5 text-purple-500" />
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-slate-400">
+                  <span>Memory</span>
+                  <span>62%</span>
+                </div>
+                <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-full w-[62%] bg-purple-500 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
+                </div>
               </div>
-              <p className="font-bold text-white group-hover:text-purple-400 transition-colors">Ver Equipos</p>
-              <p className="text-xs text-slate-500 mt-1">Control remoto VNC</p>
-            </Link>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-slate-400">
+                  <span>Storage</span>
+                  <span>89%</span>
+                </div>
+                <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-full w-[89%] bg-yellow-500 rounded-full shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="h-px bg-slate-800/50" />
+
+          <div className="flex-1">
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex justify-between items-center">
+              Alertas
+              <Bell className="w-4 h-4" />
+            </h2>
+            <div className="space-y-3">
+              {[1, 2, 3].map((_, i) => (
+                <div key={i} className="p-3 rounded-lg bg-slate-800/40 border border-slate-700/50 flex gap-3 items-start group hover:bg-slate-800/60 transition-colors cursor-pointer">
+                  <div className="mt-0.5 w-2 h-2 rounded-full bg-red-500 shrink-0 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                  <div>
+                    <p className="text-xs font-semibold text-slate-300 group-hover:text-white">Conexión inestable</p>
+                    <p className="text-[10px] text-slate-500">Servidor-0{i + 1} • Hace {i * 5 + 2}m</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   );

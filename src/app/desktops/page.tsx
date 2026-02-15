@@ -40,7 +40,7 @@ export default function DesktopsPage() {
     };
 
     return (
-        <div className="flex-1 p-8 overflow-auto bg-[#0f172a] text-slate-100 h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0f172a] to-[#0f172a]">
+        <div className="flex-1 p-8 overflow-auto bg-[#050505] text-slate-100 h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-900/40 via-[#050505] to-[#050505]">
             <VncModal
                 isOpen={!!selectedComputer}
                 onClose={() => setSelectedComputer(null)}
